@@ -9,7 +9,7 @@
 <body>
     <header>
         <h1>DL</h1>
-        <button id="donate">Donate</button>
+        <button id="donate" onclick="location.href='../PHP/addDonation.php'">Donate</button>
     </header>
     
     <?php 
@@ -84,7 +84,11 @@
         } else {
             data.forEach(row => {
                 tableBody += `<tr>
-                    <td>${row.Patron_Name}</td>
+                    <td>
+                        <a href="../PHP/profile.php?patron_id=${row.Patrons_ID}&category=${category}&status=${status}&organization=${organization}">
+                         ${row.Patron_Name}
+                        </a>
+                        </td>
                     <td>${row.Category}</td>
                     <td>${row.Organization}</td>
                     <td>${row.Donation_Status}</td>
