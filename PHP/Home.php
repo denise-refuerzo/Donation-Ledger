@@ -83,17 +83,20 @@
             tableBody = '<tr><td colspan="4">No results found</td></tr>';
         } else {
             data.forEach(row => {
-                tableBody += `<tr>
-                    <td>
-                        <a href="../PHP/profile.php?patron_id=${row.Patrons_ID}&category=${category}&status=${status}&organization=${organization}">
-                         ${row.Patron_Name}
-                        </a>
-                        </td>
-                    <td>${row.Category}</td>
-                    <td>${row.Organization}</td>
-                    <td>${row.Donation_Status}</td>
-                </tr>`;
-            });
+    const patronCell = row.anonymous == 1 || row.Patron_Name === "Anonymous"
+    ? "Anonymous"
+    : `<a href="../PHP/profile.php?patron_id=${row.Patrons_ID}&category=${category}&status=${status}&organization=${organization}">
+           ${row.Patron_Name}
+       </a>`;
+
+    tableBody += `<tr>
+        <td>${patronCell}</td>
+        <td>${row.Category}</td>
+        <td>${row.Organization}</td>
+        <td>${row.Donation_Status}</td>
+    </tr>`;
+});
+
         }
 
         $('#donationTable tbody').html(tableBody);

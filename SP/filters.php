@@ -11,27 +11,28 @@ $search = isset($_GET['search']) && $_GET['search'] !== "" ? $_GET['search'] : n
 
 try {
     if ($search) {
-        // Fix: add wildcard for partial search
         $searchTerm = '%' . $search . '%';
         $stmt = $conn->prepare("CALL search_patron(:search)");
         $stmt->bindParam(':search', $searchTerm);
-    }
-     elseif ($category || $status || $organization) {
-        // Any filters
+    } elseif ($category || $status || $organization) {
         $stmt = $conn->prepare("CALL filter_donations(:category, :status, :organization)");
         $stmt->bindParam(':category', $category);
         $stmt->bindParam(':status', $status);
         $stmt->bindParam(':organization', $organization);
     } else {
-        // No filters or search → show all
         $stmt = $conn->prepare("CALL print_all()");
     }
 
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Prevents "more than one result" errors:
+    while ($stmt->nextRowset()) {;}
+
     echo json_encode($results);
 
 } catch (PDOException $e) {
     echo json_encode(["error" => $e->getMessage()]);
 }
+
 ?>
