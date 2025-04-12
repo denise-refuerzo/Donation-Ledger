@@ -1,5 +1,5 @@
 <?php
-require_once "../PHP/dbConnection.php";
+require_once "CRUD.php";
 
 $success = "";
 $error = "";
@@ -12,89 +12,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $organization = $_POST['organization'] ?? '';
     $anonymous = isset($_POST['anonymous']) ? 1 : 0;
 
-    // ✅ Sanitize inputs and handle anonymous
     if ($anonymous) {
-        $name = null;
-        $email = null;
-        $contact = null;
+        $name = $email = $contact = null;
     } else {
         $name = trim($name) ?: null;
         $email = trim($email) ?: null;
         $contact = trim($contact) ?: null;
     }
 
-    try {
-        $db = new Database();
-        $conn = $db->getConnection();
+    $crud = new CRUD();
+    $result = $crud->addDonation($name, $email, $contact, $category, $organization, $anonymous);
 
-        // ✅ Call updated stored procedure
-        $stmt = $conn->prepare("CALL add_full_donation(:p_name, :p_email, :p_contact, :p_category, :p_organization, :p_anonymous)");
-        $stmt->bindParam(':p_name', $name);
-        $stmt->bindParam(':p_email', $email);
-        $stmt->bindParam(':p_contact', $contact);
-        $stmt->bindParam(':p_category', $category);
-        $stmt->bindParam(':p_organization', $organization);
-        $stmt->bindParam(':p_anonymous', $anonymous, PDO::PARAM_BOOL);
-
-        $stmt->execute();
-
-        // ✅ Clear additional result sets to prevent errors
-        while ($stmt->nextRowset()) {;}
-
+    if ($result === true) {
         $success = "Donation added successfully!";
-    } catch (PDOException $e) {
-        $error = "Error: " . $e->getMessage();
+    } else {
+        $error = $result;
     }
 }
 ?>
-
-<!-- ✅ HTML remains mostly unchanged -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Add Donation</title>
-    <link rel="stylesheet" href="../CSS/home.css">
-    <style>
-        .donation-form { display: flex; flex-direction: column; max-width: 400px; margin: 30px auto; gap: 10px; }
-        .message, .error { text-align: center; }
-        .message { color: green; }
-        .error { color: red; }
-        header { text-align: center; padding: 1rem; }
-        a { text-decoration: none; color: #007BFF; display: block; text-align: center; margin-top: 10px; }
-    </style>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <header><h1>Add Donation</h1></header>
+<body class="bg-secondary bg-opacity-10 text-dark">
 
-    <?php if ($success): ?><p class="message"><?= htmlspecialchars($success) ?></p><?php endif; ?>
-    <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
+    <header class="bg-dark text-white py-3 mb-4 text-center">
+        <h1 class="h3 mb-0">Add Donation</h1>
+    </header>
 
-    <form method="POST" class="donation-form">
-        <input type="text" name="name" placeholder="Patron Name">
-        <input type="email" name="email" placeholder="Email">
-        <input type="text" name="contact" placeholder="Contact">
+    <div class="container">
+        <?php if ($success): ?>
+            <div class="alert alert-success text-center"><?= htmlspecialchars($success) ?></div>
+        <?php endif; ?>
 
-        <select name="category" required>
-            <option value="">Select Category</option>
-            <option value="Item">Item</option>
-            <option value="Food">Food</option>
-            <option value="Cash">Cash</option>
-        </select>
+        <?php if ($error): ?>
+            <div class="alert alert-danger text-center"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
 
-        <select name="organization" required>
-            <option value="">Select Organization</option>
-            <option value="Nursing Home">Nursing Home</option>
-            <option value="Homeless Shelter">Homeless Shelter</option>
-            <option value="Natural Disasters">Natural Disasters</option>
-            <option value="Orphanage">Orphanage</option>
-        </select>
+        <div class="card shadow-sm mx-auto p-4 bg-light" style="max-width: 500px;">
+            <form method="POST">
+                <div class="mb-3">
+                    <input type="text" name="name" class="form-control" placeholder="Patron Name">
+                </div>
 
-        <label><input type="checkbox" name="anonymous"> Donate Anonymously</label>
+                <div class="mb-3">
+                    <input type="email" name="email" class="form-control" placeholder="Email">
+                </div>
 
-        <button type="submit">Submit Donation</button>
-    </form>
+                <div class="mb-3">
+                    <input type="text" name="contact" class="form-control" placeholder="Contact">
+                </div>
 
-    <a href="../PHP/Home.php">&larr; Back to Home</a>
+                <div class="mb-3">
+                    <select name="category" class="form-select" required>
+                        <option value="">Select Category</option>
+                        <option value="Item">Item</option>
+                        <option value="Food">Food</option>
+                        <option value="Cash">Cash</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <select name="organization" class="form-select" required>
+                        <option value="">Select Organization</option>
+                        <option value="Nursing Home">Nursing Home</option>
+                        <option value="Homeless Shelter">Homeless Shelter</option>
+                        <option value="Natural Disasters">Natural Disasters</option>
+                        <option value="Orphanage">Orphanage</option>
+                    </select>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" name="anonymous" class="form-check-input" id="anonymousCheck">
+                    <label for="anonymousCheck" class="form-check-label">Donate Anonymously</label>
+                </div>
+
+                <button type="submit" class="btn btn-dark w-100">Submit Donation</button>
+            </form>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="../PHP/Home.php" class="text-decoration-none text-secondary">&larr; Back to Home</a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

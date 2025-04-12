@@ -1,120 +1,120 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donation Ledger</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="../CSS/home.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Donation Ledger</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <header>
-        <h1>DL</h1>
-        <button id="donate" onclick="location.href='../PHP/addDonation.php'">Donate</button>
-    </header>
-    
-    <?php 
-    require_once "../PHP/dbConnection.php"; 
-    $database = new Database();
-    $conn = $database->getConnection();
-     ?>
+<body class="bg-secondary bg-opacity-10 text-dark">
 
-<div class="filters">
-    <select id="categoryFilter">
-        <option value="">All Category</option>
-        <option value="Item">Item</option>
-        <option value="Food">Food</option>
-        <option value="Cash">Cash</option>
-    </select>
-    
-    <select id="organizationFilter">
-        <option value="">All Organization</option>
-        <option value="Nursing Home">Nursing Home</option>
-        <option value="Homeless Shelter">Homeless Shelter</option>
-        <option value="Natural Disasters">Natural Disasters</option>
-        <option value="Orphanage">Orphanage</option>
-    </select>
-    
-    <select id="statusFilter">
-        <option value="">All Status</option>
-        <option value="Pending">Pending</option>
-        <option value="Done">Done</option>
-    </select>
-    
-    <input type="text" id="searchPatron" placeholder="Search Patron">
-</div>
+  <header class="bg-dark text-white p-3 d-flex justify-content-between align-items-center">
+    <h1 class="h4 m-0">Donation Ledger</h1>
+    <a href="addDonation.php" class="btn btn-light text-dark">Donate</a>
+  </header>
 
+  <div class="container my-4">
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <input type="text" id="searchInput" class="form-control bg-light text-dark" placeholder="Search Patron Name...">
+      </div>
+      <div class="col-md-2">
+        <select id="categoryFilter" class="form-select bg-light text-dark">
+          <option value="">All Categories</option>
+          <option value="Item">Item</option>
+          <option value="Food">Food</option>
+          <option value="Cash">Cash</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select id="organizationFilter" class="form-select bg-light text-dark">
+          <option value="">All Organizations</option>
+          <option value="Nursing Home">Nursing Home</option>
+          <option value="Homeless Shelter">Homeless Shelter</option>
+          <option value="Natural Disasters">Natural Disasters</option>
+          <option value="Orphanage">Orphanage</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select id="statusFilter" class="form-select bg-light text-dark">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="done">Done</option>
+        </select>
+      </div>
+    </div>
 
-    <table id="donationTable">
-        <thead>
-            <tr>
-                <th>Patron</th>
-                <th>Category</th>
-                <th>Organization</th>
-                <th>Status</th>
-            </tr>
+    <div class="table-responsive">
+      <table id="donationTable" class="table table-striped table-hover table-bordered border-dark">
+        <thead class="table-dark text-center">
+          <tr>
+            <th>Patron Name</th>
+            <th>Category</th>
+            <th>Organization</th>
+            <th>Status</th>
+          </tr>
         </thead>
-        <tbody>
-            <!-- AJAX will load data here -->
+        <tbody class="bg-light text-dark">
+          <!-- AJAX-loaded rows will go here -->
         </tbody>
-    </table>
+      </table>
+    </div>
+  </div>
 
-    <script>
-   function loadTable() {
-    let category = $('#categoryFilter').val();
-    let status = $('#statusFilter').val();
-    let organization = $('#organizationFilter').val();
-    let search = $('#searchPatron').val();
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const organizationFilter = document.getElementById('organizationFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const tableBody = document.querySelector('#donationTable tbody');
 
-    $.ajax({
-        url: '../SP/filters.php',
-        type: 'GET',
-        data: {
-            category: category,
-            status: status,
-            organization: organization,
-            search: search
-        },
-        success: function(response) {
-    try {
-        let data = JSON.parse(response);
-        let tableBody = '';
+    function fetchDonations() {
+      const params = new URLSearchParams({
+        search: searchInput.value,
+        category: categoryFilter.value,
+        organization: organizationFilter.value,
+        status: statusFilter.value
+      });
 
-        if (data.length === 0) {
-            tableBody = '<tr><td colspan="4">No results found</td></tr>';
-        } else {
-            data.forEach(row => {
-    const patronCell = row.anonymous == 1 || row.Patron_Name === "Anonymous"
-    ? "Anonymous"
-    : `<a href="../PHP/profile.php?patron_id=${row.Patrons_ID}&category=${category}&status=${status}&organization=${organization}">
-           ${row.Patron_Name}
-       </a>`;
+      fetch(`../SP/filters.php?${params}`)
+        .then(response => response.json())
+        .then(data => {
+          tableBody.innerHTML = "";
 
-    tableBody += `<tr>
-        <td>${patronCell}</td>
-        <td>${row.Category}</td>
-        <td>${row.Organization}</td>
-        <td>${row.Donation_Status}</td>
-    </tr>`;
-});
+          if (data.error) {
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">${data.error}</td></tr>`;
+            return;
+          }
 
-        }
-
-        $('#donationTable tbody').html(tableBody);
-    } catch (e) {
-        console.error("Invalid JSON:", response);
-        $('#donationTable tbody').html('<tr><td colspan="4">An error occurred</td></tr>');
+          data.forEach(row => {
+            const isAnonymous = !row.name;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${isAnonymous ? "Anonymous" : row.name}</td>
+              <td>${row.category}</td>
+              <td>${row.organization}</td>
+              <td>${row.status}</td>
+            `;
+            tableBody.appendChild(tr);
+          });
+        })
+        .catch(err => {
+          tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error fetching data.</td></tr>`;
+          console.error(err);
+        });
     }
-}
 
+    [searchInput, categoryFilter, organizationFilter, statusFilter].forEach(el => {
+      el.addEventListener('input', fetchDonations);
     });
-}
 
+    // Load initial data
+    fetchDonations();
+  </script>
 
-$(document).ready(function() {
-    loadTable(); // Load all data when page loads
-    $('#categoryFilter, #organizationFilter, #statusFilter, #searchPatron').on('change keyup', loadTable);
-});
-</script>
-
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
