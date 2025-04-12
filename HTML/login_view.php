@@ -1,3 +1,12 @@
+<?php
+require_once '../PHP/session.php';
+$session = new Session();   
+if ($session->isLoggedIn()) {
+    header("Location: logout.php"); // Redirect to home page if already logged in
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
