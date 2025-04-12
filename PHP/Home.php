@@ -88,17 +88,22 @@
             return;
           }
 
-          data.forEach(row => {
-            const isAnonymous = !row.name;
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${isAnonymous ? "Anonymous" : row.name}</td>
-              <td>${row.category}</td>
-              <td>${row.organization}</td>
-              <td>${row.status}</td>
-            `;
-            tableBody.appendChild(tr);
-          });
+          if (data.length === 0) {
+  tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">No results found.</td></tr>`;
+} else {
+  data.forEach(row => {
+    const isAnonymous = !row.name;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${isAnonymous ? "Anonymous" : row.name}</td>
+      <td>${row.category}</td>
+      <td>${row.organization}</td>
+      <td>${row.status}</td>
+    `;
+    tableBody.appendChild(tr);
+  });
+}
+
         })
         .catch(err => {
           tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error fetching data.</td></tr>`;

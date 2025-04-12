@@ -26,21 +26,11 @@ class CRUD {
         }
     }
 
-    public function printAllDonations() {
-        try {
-            $stmt = $this->conn->prepare("CALL print_all()");
-            $stmt->execute();
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            while ($stmt->nextRowset()) {;}
-            return $result;
-        } catch (PDOException $e) {
-            return ["error" => $e->getMessage()];
-        }
-    }
 
-    public function filterDonations($category, $status, $organization) {
+    public function searchAndFilter($search, $category, $status, $organization) {
         try {
-            $stmt = $this->conn->prepare("CALL filter_donations(:category, :status, :organization)");
+            $stmt = $this->conn->prepare("CALL search_and_filter(:search, :category, :status, :organization)");
+            $stmt->bindParam(':search', $search);
             $stmt->bindParam(':category', $category);
             $stmt->bindParam(':status', $status);
             $stmt->bindParam(':organization', $organization);
@@ -52,19 +42,6 @@ class CRUD {
             return ["error" => $e->getMessage()];
         }
     }
-
-    public function searchPatron($search) {
-        try {
-            $searchTerm = '%' . $search . '%';
-            $stmt = $this->conn->prepare("CALL search_patron(:search)");
-            $stmt->bindParam(':search', $searchTerm);
-            $stmt->execute();
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            while ($stmt->nextRowset()) {;}
-            return $result;
-        } catch (PDOException $e) {
-            return ["error" => $e->getMessage()];
-        }
-    }
+    
 }
 ?>
