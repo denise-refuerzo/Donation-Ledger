@@ -26,7 +26,6 @@ class CRUD {
         }
     }
 
-
     public function searchAndFilter($search, $category, $status, $organization) {
         try {
             $stmt = $this->conn->prepare("CALL search_and_filter(:search, :category, :status, :organization)");
@@ -42,6 +41,47 @@ class CRUD {
             return ["error" => $e->getMessage()];
         }
     }
+
+  
+    public function getPatronInfo($patron_id) {
+        try {
+            $stmt = $this->conn->prepare("CALL GetPatronInfo(:patron_id)");
+            $stmt->bindParam(':patron_id', $patron_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            while ($stmt->nextRowset()) {;}
+            return $result;
+        } catch (PDOException $e) {
+            return ["error" => $e->getMessage()];
+        }
+    }
+
+    public function deletePatron($patron_id) {
+        try {
+            $stmt = $this->conn->prepare("CALL deletePatron(:p_patron_id)");
+            $stmt->bindParam(':p_patron_id', $patron_id, PDO::PARAM_INT);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            return ["error" => $e->getMessage()];
+        }
+    }
+    
+    public function editPatron($patron_id, $name, $email, $contact) {
+        try {
+           
+            $stmt = $this->conn->prepare("CALL editPatron(:p_patron_id, :p_name, :p_email, :p_contact)");
+            $stmt->bindParam(':p_patron_id', $patron_id, PDO::PARAM_INT);
+            $stmt->bindParam(':p_name', $name, PDO::PARAM_STR);
+            $stmt->bindParam(':p_email', $email, PDO::PARAM_STR);
+            $stmt->bindParam(':p_contact', $contact, PDO::PARAM_STR);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            return ["error" => $e->getMessage()];
+        }
+    }
+    
     
 }
 ?>

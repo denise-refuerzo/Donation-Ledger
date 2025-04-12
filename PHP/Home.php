@@ -95,11 +95,12 @@
     const isAnonymous = !row.name;
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${isAnonymous ? "Anonymous" : row.name}</td>
+      <td><a href="../PHP/profile.php?patron_id=${row.patrons_id}" class="text-decoration-none">${isAnonymous ? "Anonymous" : row.name}</a></td>
       <td>${row.category}</td>
       <td>${row.organization}</td>
       <td>${row.status}</td>
     `;
+
     tableBody.appendChild(tr);
   });
 }
