@@ -66,5 +66,22 @@ class CRUD {
             return ["error" => $e->getMessage()];
         }
     }
+
+    public function searchAndFilter($search, $category, $status, $organization) {
+        try {
+            $stmt = $this->conn->prepare("CALL search_and_filter(:search, :category, :status, :organization)");
+            $stmt->bindParam(':search', $search);
+            $stmt->bindParam(':category', $category);
+            $stmt->bindParam(':status', $status);
+            $stmt->bindParam(':organization', $organization);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            while ($stmt->nextRowset()) {;}
+            return $result;
+        } catch (PDOException $e) {
+            return ["error" => $e->getMessage()];
+        }
+    }
+    
 }
 ?>
