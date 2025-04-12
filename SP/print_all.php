@@ -1,27 +1,9 @@
 <?php
-require_once '../PHP/dbconnection.php';
+require_once '../PHP/CRUD.php';
 
-try {
-    $database = new Database();
-    $conn = $database->getConnection();
+$crud = new CRUD();
+$data = $crud->printAllDonations();
 
-    // Call stored procedure
-    $stmt = $conn->prepare("CALL print_all()");
-    $stmt->execute();
-    $donations = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Prevent additional result errors:
-    while ($stmt->nextRowset()) {;}
-    
-    if (empty($donations)) {
-        echo json_encode(["error" => "Stored procedure returned no data"]);
-    } else {
-        echo json_encode($donations);
-    }
-    
-
-} catch (PDOException $e) {
-    echo json_encode(["error" => $e->getMessage()]);
-}
-
+header('Content-Type: application/json');
+echo json_encode($data, JSON_PRETTY_PRINT);
 ?>
