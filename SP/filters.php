@@ -7,11 +7,11 @@ $category = $_GET['category'] ?? '';
 $status = $_GET['status'] ?? '';
 $organization = $_GET['organization'] ?? '';
 $search = $_GET['search'] ?? '';
+$userType = $_GET['userType'] ?? '';  // New filter for user type
 
-// Convert all values to empty string if not set
-$results = $crud->searchAndFilter($search, $category, $status, $organization);
+// Call the method to search and filter donations
+$results = $crud->searchAndFilter($search, $category, $status, $organization, $userType);
 
 header('Content-Type: application/json');
 echo json_encode($results);
-
 ?>

@@ -26,13 +26,14 @@ class CRUD {
         }
     }
 
-    public function searchAndFilter($search, $category, $status, $organization) {
+    public function searchAndFilter($search, $category, $status, $organization, $userType) {
         try {
-            $stmt = $this->conn->prepare("CALL search_and_filter(:search, :category, :status, :organization)");
+            $stmt = $this->conn->prepare("CALL search_and_filter(:search, :category, :status, :organization, :userType)");
             $stmt->bindParam(':search', $search);
             $stmt->bindParam(':category', $category);
             $stmt->bindParam(':status', $status);
             $stmt->bindParam(':organization', $organization);
+            $stmt->bindParam(':userType', $userType);
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             while ($stmt->nextRowset()) {;}
@@ -42,7 +43,6 @@ class CRUD {
         }
     }
 
-  
     public function getPatronInfo($patron_id) {
         try {
             $stmt = $this->conn->prepare("CALL GetPatronInfo(:patron_id)");
@@ -69,7 +69,6 @@ class CRUD {
     
     public function editPatron($patron_id, $name, $email, $contact) {
         try {
-           
             $stmt = $this->conn->prepare("CALL editPatron(:p_patron_id, :p_name, :p_email, :p_contact)");
             $stmt->bindParam(':p_patron_id', $patron_id, PDO::PARAM_INT);
             $stmt->bindParam(':p_name', $name, PDO::PARAM_STR);
@@ -81,7 +80,5 @@ class CRUD {
             return ["error" => $e->getMessage()];
         }
     }
-    
-    
 }
 ?>
