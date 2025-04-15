@@ -25,11 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Login successful
                 $_SESSION["logged_in"] = true;
                 $_SESSION["username"] = $username;
-                header("Location: ../PHP/Home.php");
+                header("Location: ../PHP/index.php");
                 exit();
             } else {
                 // Invalid credentials
-                header("Location: ../HTML/login_view.php?error=1");
+                header("Location: ../PHP/login_view.php?error=1");
                 exit();
             }
         } catch (PDOException $e) {
@@ -37,6 +37,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
-header("Location: ../HTML/login_view.php");
+header("Location: ../PHP/login_view.php");
 exit();
 ?>

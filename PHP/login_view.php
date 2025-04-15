@@ -2,7 +2,7 @@
 require_once '../PHP/session.php';
 $session = new Session();   
 if ($session->isLoggedIn()) {
-    header("Location: ../PHP/Home.php"); // Redirect to home page if already logged in
+    header("Location: ../PHP/index.php"); // Redirect to home page if already logged in
     exit;
 }
 ?>
@@ -69,7 +69,7 @@ if ($session->isLoggedIn()) {
       });
 
       setTimeout(() => {
-        window.location.href = '../PHP/Home.php';
+        window.location.href = '../PHP/index.php';
       }, 2000);
     }
   </script>

@@ -27,22 +27,47 @@ class CRUD {
     }
 
     public function searchAndFilter($search, $category, $status, $organization, $userType) {
-        try {
-            $stmt = $this->conn->prepare("CALL search_and_filter(:search, :category, :status, :organization, :userType)");
+        try {     
+            $stmt = $this->conn->prepare("CALL searchAndfilter(:search, :category, :status, :organization, :userType)");
             $stmt->bindParam(':search', $search);
             $stmt->bindParam(':category', $category);
             $stmt->bindParam(':status', $status);
             $stmt->bindParam(':organization', $organization);
             $stmt->bindParam(':userType', $userType);
             $stmt->execute();
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            while ($stmt->nextRowset()) {;}
-            return $result;
+    
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            while ($stmt->nextRowset()) {;} // prevent "out of sync" issues
+            return $data;
         } catch (PDOException $e) {
             return ["error" => $e->getMessage()];
         }
     }
 
+    public function getAllCategories() {
+        try {
+            $stmt = $this->conn->prepare("CALL getAllcategories()");
+            $stmt->execute();
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            while ($stmt->nextRowset()) {;}
+            return $data;
+        } catch (PDOException $e) {
+            return ["error" => $e->getMessage()];
+        }
+    }
+    public function getAllOrganizations() {
+        try {
+            $stmt = $this->conn->prepare("CALL getAllorganizations()");
+            $stmt->execute();
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            while ($stmt->nextRowset()) {;}
+            return $data;
+        } catch (PDOException $e) {
+            return ["error" => $e->getMessage()];
+        }
+    }
+
+  
     public function getPatronInfo($patron_id) {
         try {
             $stmt = $this->conn->prepare("CALL GetPatronInfo(:patron_id)");

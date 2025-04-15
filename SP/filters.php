@@ -2,16 +2,16 @@
 require_once '../PHP/CRUD.php';
 
 $crud = new CRUD();
+$category = $_POST['category'] ?? '';
+$status = $_POST['status'] ?? '';
+$organization = $_POST['organization'] ?? '';
+$search = $_POST['search'] ?? '';
+$userType = $_POST['userType'] ?? '';
 
-$category = $_GET['category'] ?? '';
-$status = $_GET['status'] ?? '';
-$organization = $_GET['organization'] ?? '';
-$search = $_GET['search'] ?? '';
-$userType = $_GET['userType'] ?? '';  // New filter for user type
-
-// Call the method to search and filter donations
+// Convert all values to empty string if not set
 $results = $crud->searchAndFilter($search, $category, $status, $organization, $userType);
 
 header('Content-Type: application/json');
 echo json_encode($results);
+
 ?>
