@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="text-center mt-3">
-            <a href="../PHP/Home.php" class="text-decoration-none text-secondary">&larr; Back to Home</a>
+            <a href="../PHP/index.php" class="text-decoration-none text-secondary">&larr; Back to Home</a>
         </div>
     </div>
 

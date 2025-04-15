@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
     $deleteResult = $crud->deletePatron($_GET['patron_id']);
     if ($deleteResult === true) {
         // Redirect after successful deletion
-        header("Location: ../PHP/Home.php?deleted=1");
+        header("Location: ../PHP/index.php?deleted=1");
         exit;
     } else {
         echo "<div class='alert alert-danger'>Error: " . $deleteResult['error'] . "</div>";
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
     </div>
 
     <!-- Back Button -->
-    <a href="../PHP/Home.php" class="btn btn-secondary">&larr; Back</a>
+    <a href="../PHP/index.php" class="btn btn-secondary">&larr; Back</a>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

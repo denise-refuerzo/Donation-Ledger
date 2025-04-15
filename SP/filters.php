@@ -2,16 +2,12 @@
 require_once '../PHP/CRUD.php';
 
 $crud = new CRUD();
+$search = $_POST['search'] ?? '';
+$category = $_POST['category'] ?? '';
+$status = $_POST['status'] ?? '';
+$organization = $_POST['organization'] ?? '';
 
-$category = $_GET['category'] ?? '';
-$status = $_GET['status'] ?? '';
-$organization = $_GET['organization'] ?? '';
-$search = $_GET['search'] ?? '';
-
-// Convert all values to empty string if not set
-$results = $crud->searchAndFilter($search, $category, $status, $organization);
-
-header('Content-Type: application/json');
-echo json_encode($results);
+$data = $crud->searchAndFilter($search, $category, $status, $organization);
+echo json_encode($data);
 
 ?>
