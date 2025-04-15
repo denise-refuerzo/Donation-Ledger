@@ -26,15 +26,16 @@ class CRUD {
         }
     }
 
-    public function searchAndFilter($search, $category, $status, $organization) {
-        try {
-            $stmt = $this->conn->prepare("CALL searchAndfilter(:search, :category, :status, :organization)");
+    public function searchAndFilter($search, $category, $status, $organization, $userType) {
+        try {     
+            $stmt = $this->conn->prepare("CALL searchAndfilter(:search, :category, :status, :organization, :userType)");
             $stmt->bindParam(':search', $search);
             $stmt->bindParam(':category', $category);
             $stmt->bindParam(':status', $status);
             $stmt->bindParam(':organization', $organization);
+            $stmt->bindParam(':userType', $userType);
             $stmt->execute();
-            
+    
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
             while ($stmt->nextRowset()) {;} // prevent "out of sync" issues
             return $data;
@@ -42,7 +43,6 @@ class CRUD {
             return ["error" => $e->getMessage()];
         }
     }
-    
 
     public function getAllCategories() {
         try {
@@ -55,7 +55,6 @@ class CRUD {
             return ["error" => $e->getMessage()];
         }
     }
-    
     public function getAllOrganizations() {
         try {
             $stmt = $this->conn->prepare("CALL getAllorganizations()");
@@ -67,9 +66,6 @@ class CRUD {
             return ["error" => $e->getMessage()];
         }
     }
-    
-    
-    
 
   
     public function getPatronInfo($patron_id) {
@@ -98,7 +94,6 @@ class CRUD {
     
     public function editPatron($patron_id, $name, $email, $contact) {
         try {
-           
             $stmt = $this->conn->prepare("CALL editPatron(:p_patron_id, :p_name, :p_email, :p_contact)");
             $stmt->bindParam(':p_patron_id', $patron_id, PDO::PARAM_INT);
             $stmt->bindParam(':p_name', $name, PDO::PARAM_STR);
@@ -110,7 +105,5 @@ class CRUD {
             return ["error" => $e->getMessage()];
         }
     }
-    
-    
 }
 ?>

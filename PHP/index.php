@@ -23,18 +23,25 @@
           <option value="">All Categories</option>
         </select>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
         <select id="organizationFilter" class="form-select bg-light text-dark" style="max-height: 150px; overflow-y: auto;">
           <option value="">All Organizations</option>
         </select>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
         <select id="statusFilter" class="form-select bg-light text-dark">
           <option value="">All Status</option>
           <option value="pending">Pending</option>
           <option value="done">Done</option>
         </select>
       </div>
+      <div class="col-md-2">
+         <select id="userTypeFilter" class="form-select bg-light text-dark">
+           <option value="">All Users</option>
+           <option value="named">Named Users</option>
+           <option value="anonymous">Anonymous Users</option>
+         </select>
+       </div>
     </div>
 
     <div class="table-responsive">
@@ -65,6 +72,7 @@
     const categoryFilter = document.getElementById('categoryFilter');
     const organizationFilter = document.getElementById('organizationFilter');
     const statusFilter = document.getElementById('statusFilter');
+    const userTypeFilter = document.getElementById('userTypeFilter');
     const tableBody = document.querySelector('#donationTable tbody');
     const pagination = document.getElementById('pagination');
 
@@ -102,6 +110,7 @@
       formData.append("category", categoryFilter.value);
       formData.append("organization", organizationFilter.value);
       formData.append("status", statusFilter.value);
+      formData.append("userType", userTypeFilter.value);
 
       fetch('../SP/filters.php', {
         method: 'POST',
@@ -166,7 +175,7 @@
       }
     }
 
-    [searchInput, categoryFilter, organizationFilter, statusFilter].forEach(el => {
+    [searchInput, categoryFilter, organizationFilter, statusFilter, userTypeFilter].forEach(el => {
       el.addEventListener('input', fetchDonations);
     });
   </script>
