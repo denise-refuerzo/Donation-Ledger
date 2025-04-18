@@ -21,11 +21,22 @@ if (empty($info)) {
 
 $patron = $info[0]; // basic patron info
 
+// Group donations by timestamp
+$groupedDonations = [];
+foreach ($info as $donation) {
+    if (!empty($donation['timestamp'])) {
+        $timestamp = $donation['timestamp'];
+        if (!isset($groupedDonations[$timestamp])) {
+            $groupedDonations[$timestamp] = [];
+        }
+        $groupedDonations[$timestamp][] = $donation;
+    }
+}
+
 // Handle deletion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
     $deleteResult = $crud->deletePatron($_GET['patron_id']);
     if ($deleteResult === true) {
-        // Redirect after successful deletion
         header("Location: ../PHP/index.php?deleted=1");
         exit;
     } else {
@@ -67,45 +78,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
       <button type="submit" class="btn btn-danger mb-4">Delete Patron</button>
     </form>
 
-    <?php if (count($info) > 1 || !empty($info[0]['timestamp'])): ?>
-  <h4>Donation History</h4>
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped">
-      <thead class="table-dark">
-        <tr>
-          <th>Date</th>
-          <th>Category</th>
-          <th>Organization</th>
-          <th>Status</th>
-          <th>Cash Amount</th>
-          <th>Food Kind</th>
-          <th>Food Quantity</th>
-          <th>Item Name</th>
-          <th>Item Quantity</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php foreach ($info as $donation): ?>
-          <?php if (!empty($donation['timestamp'])): ?>
+    <!-- Donation History -->
+    <?php if (!empty($groupedDonations)): ?>
+      <h4>Donation History</h4>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
             <tr>
-              <td><?= htmlspecialchars($donation['timestamp']) ?></td>
-              <td><?= htmlspecialchars($donation['category'] ?? '-') ?></td>
-              <td><?= htmlspecialchars($donation['organization'] ?? '-') ?></td>
-              <td><?= htmlspecialchars($donation['status'] ?? '-') ?></td>
-              <td><?= htmlspecialchars($donation['cash_amount'] ?? '-') ?></td>
-              <td><?= htmlspecialchars($donation['food_kind'] ?? '-') ?></td>
-              <td><?= htmlspecialchars($donation['food_quantity'] ?? '-') ?></td>
-              <td><?= htmlspecialchars($donation['item_name'] ?? '-') ?></td>
-              <td><?= htmlspecialchars($donation['item_quantity'] ?? '-') ?></td>
+              <th>Date</th>
+              <th>Category</th>
+              <th>Organization</th>
+              <th>Cash Amount</th>
+              <th>Food Kind</th>
+              <th>Food Quantity</th>
+              <th>Item Name</th>
+              <th>Item Quantity</th>
+              <th>Status</th>
             </tr>
-          <?php endif; ?>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
-  </div>
-<?php endif; ?>
-
-
+          </thead>
+          <tbody>
+            <?php foreach ($groupedDonations as $timestamp => $donations): ?>
+              <?php foreach ($donations as $donation): ?>
+                <tr>
+                  <td><?= htmlspecialchars($donation['timestamp'] ?? '-') ?></td>
+                  <td><?= htmlspecialchars($donation['category'] ?? '-') ?></td>
+                  <td><?= htmlspecialchars($donation['organization'] ?? '-') ?></td>
+                  <td><?= htmlspecialchars($donation['cash_amount'] ?? '-') ?></td>
+                  <td><?= htmlspecialchars($donation['food_kind'] ?? '-') ?></td>
+                  <td><?= htmlspecialchars($donation['food_quantity'] ?? '-') ?></td>
+                  <td><?= htmlspecialchars($donation['item_name'] ?? '-') ?></td>
+                  <td><?= htmlspecialchars($donation['item_quantity'] ?? '-') ?></td>
+                  <td><?= htmlspecialchars($donation['status'] ?? '-') ?></td>
+                </tr>
+              <?php endforeach; ?>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    <?php endif; ?>
 
     <!-- Back Button -->
     <a href="../PHP/index.php" class="btn btn-secondary">&larr; Back</a>
