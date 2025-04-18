@@ -9,15 +9,20 @@ class CRUD {
         $this->conn = $db->getConnection();
     }
 
-    public function addDonation($name, $email, $contact, $category, $organization, $anonymous) {
+    public function addDonation($name, $email, $contact, $category, $organization, $anonymous, $item_name, $item_qty, $food_kind, $food_qty, $cash_amt) {
         try {
-            $stmt = $this->conn->prepare("CALL add_full_donation(:p_name, :p_email, :p_contact, :p_category, :p_organization, :p_anonymous)");
+            $stmt = $this->conn->prepare("CALL addDonation(:p_name, :p_email, :p_contact, :p_category, :p_organization, :p_anonymous, :item_name, :item_qty, :food_kind, :food_qty, :cash_amt)");
             $stmt->bindParam(':p_name', $name);
             $stmt->bindParam(':p_email', $email);
             $stmt->bindParam(':p_contact', $contact);
             $stmt->bindParam(':p_category', $category);
             $stmt->bindParam(':p_organization', $organization);
             $stmt->bindParam(':p_anonymous', $anonymous, PDO::PARAM_BOOL);
+            $stmt->bindParam(':item_name', $item_name);
+            $stmt->bindParam(':item_qty', $item_qty);
+            $stmt->bindParam(':food_kind', $food_kind);
+            $stmt->bindParam(':food_qty', $food_qty);
+            $stmt->bindParam(':cash_amt', $cash_amt);
             $stmt->execute();
             while ($stmt->nextRowset()) {;}
             return true;
