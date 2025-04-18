@@ -67,29 +67,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
       <button type="submit" class="btn btn-danger mb-4">Delete Patron</button>
     </form>
 
-    <h4>Donation History</h4>
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-          <tr>
-            <th>Date</th>
-            <th>Category</th>
-            <th>Organization</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($info as $donation): ?>
+    <?php if (count($info) > 1 || !empty($info[0]['timestamp'])): ?>
+  <h4>Donation History</h4>
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark">
+        <tr>
+          <th>Date</th>
+          <th>Category</th>
+          <th>Organization</th>
+          <th>Status</th>
+          <th>Cash Amount</th>
+          <th>Food Kind</th>
+          <th>Food Quantity</th>
+          <th>Item Name</th>
+          <th>Item Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($info as $donation): ?>
+          <?php if (!empty($donation['timestamp'])): ?>
             <tr>
               <td><?= htmlspecialchars($donation['timestamp']) ?></td>
-              <td><?= htmlspecialchars($donation['category']) ?></td>
-              <td><?= htmlspecialchars($donation['organization']) ?></td>
-              <td><?= htmlspecialchars($donation['status']) ?></td>
+              <td><?= htmlspecialchars($donation['category'] ?? '-') ?></td>
+              <td><?= htmlspecialchars($donation['organization'] ?? '-') ?></td>
+              <td><?= htmlspecialchars($donation['status'] ?? '-') ?></td>
+              <td><?= htmlspecialchars($donation['cash_amount'] ?? '-') ?></td>
+              <td><?= htmlspecialchars($donation['food_kind'] ?? '-') ?></td>
+              <td><?= htmlspecialchars($donation['food_quantity'] ?? '-') ?></td>
+              <td><?= htmlspecialchars($donation['item_name'] ?? '-') ?></td>
+              <td><?= htmlspecialchars($donation['item_quantity'] ?? '-') ?></td>
             </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-    </div>
+          <?php endif; ?>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+<?php endif; ?>
+
+
 
     <!-- Back Button -->
     <a href="../PHP/index.php" class="btn btn-secondary">&larr; Back</a>
