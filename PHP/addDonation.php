@@ -1,5 +1,5 @@
 <?php
-require_once "CRUD.php";
+require_once "../PHP/CRUD.php";
 
 $success = "";
 $error = "";
@@ -8,9 +8,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'] ?? null;
     $email = $_POST['email'] ?? null;
     $contact = $_POST['contact'] ?? null;
-    $category = $_POST['category'] ?? '';
+    $categories = [];
+
+    if (isset($_POST['donate_item'])) {
+        $categories[] = ['category' => 'Item', 'item_name' => $_POST['item_name'], 'item_qty' => $_POST['item_qty']];
+    }
+
+    if (isset($_POST['donate_food'])) {
+        $categories[] = ['category' => 'Food', 'food_kind' => $_POST['food_kind'], 'food_qty' => $_POST['food_qty']];
+    }
+
+    if (isset($_POST['donate_cash'])) {
+        $categories[] = ['category' => 'Cash', 'cash_amt' => $_POST['cash_amt']];
+    }
     $organization = $_POST['organization'] ?? '';
     $anonymous = isset($_POST['anonymous']) ? 1 : 0;
+
 
     if ($anonymous) {
         $name = $email = $contact = null;
@@ -21,13 +34,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $crud = new CRUD();
-    $result = $crud->addDonation($name, $email, $contact, $category, $organization, $anonymous);
+    $error = "";
 
-    if ($result === true) {
-        $success = "Donation added successfully!";
-    } else {
-        $error = $result;
+    if (empty($categories)) {
+        $error = "Please select at least one donation category.";
     }
+    
+    if (!$error) {
+        foreach ($categories as $cat) {
+        $category = $cat['category'];
+        $item_name = $cat['item_name'] ?? null;
+        $item_qty = $cat['item_qty'] ?? null;
+        $food_kind = $cat['food_kind'] ?? null;
+        $food_qty = $cat['food_qty'] ?? null;
+        $cash_amt = $cat['cash_amt'] ?? null;
+
+        $result = $crud->addDonation($name, $email, $contact, $category, $organization, $anonymous, $item_name, $item_qty, $food_kind, $food_qty, $cash_amt);
+
+        if ($result !== true) {
+            $error = $result;
+            break;
+        }
+        }
+    }
+
+    if (!$error) {
+        $success = "Donation added successfully!";
+        $_POST = []; // ✅ Clear form inputs after success
+    }
+    
 }
 ?>
 <!DOCTYPE html>
@@ -57,40 +92,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="card shadow-sm mx-auto p-4 bg-light" style="max-width: 500px;">
             <form method="POST">
                 <div class="mb-3">
-                    <input type="text" name="name" class="form-control" placeholder="Patron Name">
+                    <input type="text" name="name" class="form-control" placeholder="Patron Name" value="<?= htmlspecialchars($_POST['name'] ?? '') ?>">
                 </div>
 
                 <div class="mb-3">
-                    <input type="email" name="email" class="form-control" placeholder="Email">
+                    <input type="email" name="email" class="form-control" placeholder="Email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
                 </div>
 
                 <div class="mb-3">
-                    <input type="text" name="contact" class="form-control" placeholder="Contact">
+                    <input type="text" name="contact" class="form-control" placeholder="Contact" value="<?= htmlspecialchars($_POST['contact'] ?? '') ?>">
                 </div>
 
                 <div class="mb-3">
-                    <select name="category" class="form-select" required>
-                        <option value="">Select Category</option>
-                        <option value="Item">Item</option>
-                        <option value="Food">Food</option>
-                        <option value="Cash">Cash</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <select name="organization" class="form-select" required>
-                        <option value="">Select Organization</option>
-                        <option value="Nursing Home">Nursing Home</option>
-                        <option value="Homeless Shelter">Homeless Shelter</option>
-                        <option value="Natural Disasters">Natural Disasters</option>
-                        <option value="Orphanage">Orphanage</option>
-                    </select>
+                    <input list="orgList" name="organization" class="form-control" placeholder="Select or enter an organization" required>
+                    <datalist id="orgList"></datalist>
                 </div>
 
                 <div class="form-check mb-3">
                     <input type="checkbox" name="anonymous" class="form-check-input" id="anonymousCheck">
                     <label for="anonymousCheck" class="form-check-label">Donate Anonymously</label>
                 </div>
+
+                <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="itemCheck" name="donate_item">
+                <label class="form-check-label" for="itemCheck">Donate Item</label>
+            </div>
+            <div class="mb-2 d-none" id="itemFields">
+                <input type="text" class="form-control mb-1" name="item_name" placeholder="Item Name">
+                <input type="number" class="form-control" name="item_qty" placeholder="Quantity">
+            </div>
+
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="foodCheck" name="donate_food">
+                <label class="form-check-label" for="foodCheck">Donate Food</label>
+            </div>
+            <div class="mb-2 d-none" id="foodFields">
+                <input type="text" class="form-control mb-1" name="food_kind" placeholder="Food Kind">
+                <input type="number" class="form-control" name="food_qty" placeholder="Quantity">
+            </div>
+
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="cashCheck" name="donate_cash">
+                <label class="form-check-label" for="cashCheck">Donate Cash</label>
+            </div>
+            <div class="mb-2 d-none" id="cashFields">
+                <input type="number" step="0.01" class="form-control" name="cash_amt" placeholder="Amount">
+            </div>
 
                 <button type="submit" class="btn btn-dark w-100">Submit Donation</button>
             </form>
@@ -100,8 +147,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="../PHP/index.php" class="text-decoration-none text-secondary">&larr; Back to Home</a>
         </div>
     </div>
+    <script>
+            document.addEventListener('DOMContentLoaded', function () {
+            fetch('../SP/getOrganizations.php')
+                .then(res => res.json())
+                .then(data => {
+                    const datalist = document.getElementById('orgList');
+                    datalist.innerHTML = ''; // Clear just in case
+                    data.forEach(org => {
+                        const option = document.createElement('option');
+                        option.value = org.organization;
+                        datalist.appendChild(option);
+                    });
+                })
+                .catch(err => console.error('Failed to load organizations:', err));
+            });
+    </script>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const toggleSection = (checkId, sectionId, requiredFields = []) => {
+            const checkbox = document.getElementById(checkId);
+            const section = document.getElementById(sectionId);
+
+            checkbox.addEventListener('change', function () {
+                const checked = this.checked;
+                section.classList.toggle('d-none', !checked);
+
+                requiredFields.forEach(fieldName => {
+                    const field = document.querySelector(`[name="${fieldName}"]`);
+                    if (field) {
+                        field.required = checked;
+
+                        // 🧽 Clear the field if unchecked
+                        if (!checked) {
+                            field.value = "";
+                        }
+                    }
+                });
+            });
+        };
+
+        toggleSection('itemCheck', 'itemFields', ['item_name', 'item_qty']);
+        toggleSection('foodCheck', 'foodFields', ['food_kind', 'food_qty']);
+        toggleSection('cashCheck', 'cashFields', ['cash_amt']);
+    </script>
+
+
 </body>
 </html>
