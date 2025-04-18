@@ -11,25 +11,32 @@ class CRUD {
 
     public function addDonation($name, $email, $contact, $category, $organization, $anonymous, $item_name, $item_qty, $food_kind, $food_qty, $cash_amt) {
         try {
-            $stmt = $this->conn->prepare("CALL addDonation(:p_name, :p_email, :p_contact, :p_category, :p_organization, :p_anonymous, :item_name, :item_qty, :food_kind, :food_qty, :cash_amt)");
+            $stmt = $this->conn->prepare("CALL addDonation(:p_name, :p_email, :p_contact, :p_category, :p_organization, :p_anonymous, :p_item_name, :p_item_qty, :p_food_kind, :p_food_qty, :p_cash_amt, @donation_id)");
+    
             $stmt->bindParam(':p_name', $name);
             $stmt->bindParam(':p_email', $email);
             $stmt->bindParam(':p_contact', $contact);
             $stmt->bindParam(':p_category', $category);
             $stmt->bindParam(':p_organization', $organization);
             $stmt->bindParam(':p_anonymous', $anonymous, PDO::PARAM_BOOL);
-            $stmt->bindParam(':item_name', $item_name);
-            $stmt->bindParam(':item_qty', $item_qty);
-            $stmt->bindParam(':food_kind', $food_kind);
-            $stmt->bindParam(':food_qty', $food_qty);
-            $stmt->bindParam(':cash_amt', $cash_amt);
+            $stmt->bindParam(':p_item_name', $item_name);
+            $stmt->bindParam(':p_item_qty', $item_qty);
+            $stmt->bindParam(':p_food_kind', $food_kind);
+            $stmt->bindParam(':p_food_qty', $food_qty);
+            $stmt->bindParam(':p_cash_amt', $cash_amt);
+    
             $stmt->execute();
-            while ($stmt->nextRowset()) {;}
+    
+            $stmt = $this->conn->query("SELECT @donation_id AS donation_id");
+            $donation_id = $stmt->fetchColumn();
+     
             return true;
+    
         } catch (PDOException $e) {
             return "Error: " . $e->getMessage();
         }
     }
+    
 
     public function searchAndFilter($search, $category, $status, $organization, $userType) {
         try {     
