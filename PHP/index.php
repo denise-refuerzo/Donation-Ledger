@@ -11,6 +11,7 @@
   <header class="bg-dark text-white p-3 d-flex justify-content-between align-items-center">
     <h1 class="h4 m-0">Donation Ledger</h1>
     <a href="addDonation.php" class="btn btn-light text-dark">Donate</a>
+    <a href="Register.php" class="btn btn-light text-dark">Register</a>
   </header>
 
   <div class="container my-4">

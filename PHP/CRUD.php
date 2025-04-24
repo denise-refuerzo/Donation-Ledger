@@ -117,5 +117,19 @@ class CRUD {
             return ["error" => $e->getMessage()];
         }
     }
+
+    public function RegisterPatron($name, $email, $contact, $password) {
+        try {
+            $stmt = $this->conn->prepare("CALL register(:p_name, :p_email, :p_contact, :p_password)");
+            $stmt->bindParam(':p_name', $name, PDO::PARAM_STR);
+            $stmt->bindParam(':p_email', $email, PDO::PARAM_STR);
+            $stmt->bindParam(':p_contact', $contact, PDO::PARAM_STR);
+            $stmt->bindParam(':p_password', $password, PDO::PARAM_STR);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            return ["error" => $e->getMessage()];
+        }
+    }
 }
 ?>
