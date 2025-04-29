@@ -9,6 +9,25 @@ class CRUD {
         $this->conn = $db->getConnection();
     }
 
+    public function getCashDonations() {
+        $stmt = $this->conn->prepare("CALL cashDonations()");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getTotalDonations() {
+        $stmt = $this->conn->prepare("CALL totalDonations()");
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getCategorySummary() {
+        $stmt = $this->conn->prepare("CALL categoryDonationsummary()");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+
     public function addDonation($name, $email, $contact, $category, $organization, $anonymous, $item_name, $item_qty, $food_kind, $food_qty, $cash_amt) {
         try {
             $stmt = $this->conn->prepare("CALL addDonation(:p_name, :p_email, :p_contact, :p_category, :p_organization, :p_anonymous, :p_item_name, :p_item_qty, :p_food_kind, :p_food_qty, :p_cash_amt, @donation_id)");
