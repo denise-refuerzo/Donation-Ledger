@@ -55,6 +55,34 @@ class CRUD {
             return "Error: " . $e->getMessage();
         }
     }
+
+    public function addDonationWithID($patron_id, $category, $organization, $anonymous, $item_name, $item_qty, $food_kind, $food_qty, $cash_amt) {
+        try {
+            // Assuming patron_id is passed correctly
+            $stmt = $this->conn->prepare("CALL addDonation(NULL, NULL, NULL, :p_category, :p_organization, :p_anonymous, :p_item_name, :p_item_qty, :p_food_kind, :p_food_qty, :p_cash_amt, @donation_id, :p_id)");
+    
+            $stmt->bindParam(':p_category', $category);
+            $stmt->bindParam(':p_organization', $organization);
+            $stmt->bindParam(':p_anonymous', $anonymous, PDO::PARAM_BOOL);
+            $stmt->bindParam(':p_item_name', $item_name);
+            $stmt->bindParam(':p_item_qty', $item_qty);
+            $stmt->bindParam(':p_food_kind', $food_kind);
+            $stmt->bindParam(':p_food_qty', $food_qty);
+            $stmt->bindParam(':p_cash_amt', $cash_amt);
+            $stmt->bindParam(':p_id', $patron_id);
+    
+            $stmt->execute();
+    
+            $stmt = $this->conn->query("SELECT @donation_id AS donation_id");
+            $donation_id = $stmt->fetchColumn();
+    
+            return $donation_id;
+        } catch (PDOException $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
+    
+    
     
 
     public function searchAndFilter($search, $category, $status, $organization, $userType) {
@@ -139,16 +167,21 @@ class CRUD {
 
     public function RegisterPatron($name, $email, $contact, $password) {
         try {
-            $stmt = $this->conn->prepare("CALL register(:p_name, :p_email, :p_contact, :p_password)");
-            $stmt->bindParam(':p_name', $name, PDO::PARAM_STR);
-            $stmt->bindParam(':p_email', $email, PDO::PARAM_STR);
-            $stmt->bindParam(':p_contact', $contact, PDO::PARAM_STR);
-            $stmt->bindParam(':p_password', $password, PDO::PARAM_STR);
-            $stmt->execute();
-            return true;
+            $stmt = $this->conn->prepare("CALL register(?, ?, ?, ?, @new_id)");
+            $stmt->execute([$name, $email, $contact, $password]);
+            $stmt->closeCursor();
+    
+            $result = $this->conn->query("SELECT @new_id AS id")->fetch(PDO::FETCH_ASSOC);
+    
+            if ($result && $result['id'] == -1) {
+                return -1; // email exists
+            }
+    
+            return $result['id'] ?? false;
         } catch (PDOException $e) {
-            return ["error" => $e->getMessage()];
+            return false;
         }
     }
+     
 }
 ?>
