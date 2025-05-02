@@ -39,12 +39,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Only set patron_id for users
                 if ($user['role'] === 'user') {
                     $_SESSION["patron_id"] = $user['patrons_id'];
-                }
-
-                // Redirect based on role
-                if ($user['role'] === 'admin') {
-                    header("Location: ../PHP/index.php");
+                    // Redirect user to their profile page
+                    header("Location: ../CONNECTED/profile.php?patron_id=" . urlencode($user['patrons_id']));
                 } else {
+                    // Redirect admin to the index page
                     header("Location: ../PHP/index.php");
                 }
                 exit();

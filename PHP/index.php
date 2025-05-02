@@ -4,6 +4,25 @@ require_once 'session.php';
 
 $session = new Session();
 $isLoggedIn = $session->isLoggedIn();
+
+// Restrict access to admins only
+if (!$isLoggedIn) {
+    header("Location: login_view.php");
+    exit();
+}
+
+if ($session->getRole() === 'user') {
+    // Redirect users to their profile page
+    $patronId = $session->getPatronId();
+    header("Location: ../CONNECTED/profile.php?patron_id=" . urlencode($patronId));
+    exit();
+}
+
+if ($session->getRole() !== 'admin') {
+    // Redirect non-admins to an error page or login
+    header("Location: login_view.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
