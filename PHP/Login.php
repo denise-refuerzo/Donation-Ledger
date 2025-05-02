@@ -14,18 +14,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $db = new Database();
             $conn = $db->getConnection();
 
-            // Call the stored procedure to get the hashed password
-            $stmt = $conn->prepare("CALL get_user_credentials(:p_username)");
+            $user = null;
+
+            // Check in admin table
+            $stmt = $conn->prepare("CALL get_admin_credentials(:p_username)");
             $stmt->bindParam(':p_username', $username);
             $stmt->execute();
-
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user) {
+                // Check in user table
+                $stmt = $conn->prepare("CALL get_user_credentials(:p_email)");
+                $stmt->bindParam(':p_email', $username);
+                $stmt->execute();
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            }
 
             if ($user && password_verify($password, $user['password'])) {
                 // Login successful
                 $_SESSION["logged_in"] = true;
                 $_SESSION["username"] = $username;
-                header("Location: ../PHP/index.php");
+                $_SESSION["role"] = $user['role'];
+
+                // Redirect based on role
+                if ($user['role'] === 'admin') {
+                    header("Location: ../PHP/index.php");
+                } else {
+                    header("Location: ../PHP/index.php");
+                }
                 exit();
             } else {
                 // Invalid credentials

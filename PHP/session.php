@@ -18,6 +18,10 @@ class Session {
         return isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
     }
 
+    public function getRole() {
+        return isset($_SESSION['role']) ? $_SESSION['role'] : null;
+    }
+
     public function logout() {
         session_unset();
         session_destroy();
