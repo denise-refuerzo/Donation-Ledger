@@ -21,7 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($patronId === -1) {
         echo json_encode(['status' => 'duplicate']);
     } elseif ($patronId) {
+        session_start();
+        $_SESSION["logged_in"] = true;
+        $_SESSION["role"] = 'user';
+        $_SESSION["patron_id"] = $patronId; // Store the patron_id in the session
+
         echo json_encode(['status' => 'success', 'patron_id' => $patronId]);
+        exit();
     } else {
         echo json_encode(['status' => 'error']);
     }

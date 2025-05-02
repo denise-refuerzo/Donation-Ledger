@@ -36,6 +36,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION["username"] = $username;
                 $_SESSION["role"] = $user['role'];
 
+                // Only set patron_id for users
+                if ($user['role'] === 'user') {
+                    $_SESSION["patron_id"] = $user['patrons_id'];
+                }
+
                 // Redirect based on role
                 if ($user['role'] === 'admin') {
                     header("Location: ../PHP/index.php");

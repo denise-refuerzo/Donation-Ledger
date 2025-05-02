@@ -22,6 +22,10 @@ class Session {
         return isset($_SESSION['role']) ? $_SESSION['role'] : null;
     }
 
+    public function getPatronId() {
+        return isset($_SESSION['patron_id']) ? $_SESSION['patron_id'] : null;
+    }
+
     public function logout() {
         session_unset();
         session_destroy();

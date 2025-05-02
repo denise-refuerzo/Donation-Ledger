@@ -20,9 +20,15 @@ $isLoggedIn = $session->isLoggedIn();
     <h1 class="h4 m-0">Donation Ledger</h1>
     <a href="addDonation.php" class="btn btn-light text-dark">Donate</a>
     <?php if (!$isLoggedIn): ?>
-      <a href="Register.php" class="btn btn-light text-dark">Register</a>
-    <?php else: ?>
-      <a href="logout.php" class="btn btn-light text-dark">Logout</a>
+        <a href="Register.php" class="btn btn-light text-dark">Register</a>
+    <?php else: ?>  
+        <?php if ($session->getRole() === 'user'): ?>
+            <?php
+            $patronId = $session->getPatronId();
+            ?>
+            <a href="../CONNECTED/profile.php?patron_id=<?= urlencode($patronId) ?>" class="btn btn-light text-dark">Profile</a>
+        <?php endif; ?>
+        <a href="logout.php" class="btn btn-light text-dark">Logout</a>
     <?php endif; ?>
   </header>
 

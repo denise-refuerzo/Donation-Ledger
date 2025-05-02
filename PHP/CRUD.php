@@ -179,6 +179,7 @@ class CRUD {
     
             return $result['id'] ?? false;
         } catch (PDOException $e) {
+            error_log("Error in RegisterPatron: " . $e->getMessage());
             return false;
         }
     }
