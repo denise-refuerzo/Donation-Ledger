@@ -28,7 +28,6 @@ $isLoggedIn = $session->isLoggedIn();
             ?>
             <a href="../CONNECTED/profile.php?patron_id=<?= urlencode($patronId) ?>" class="btn btn-light text-dark">Profile</a>
         <?php endif; ?>
-        <a href="logout.php" class="btn btn-light text-dark">Logout</a>
     <?php endif; ?>
   </header>
 
