@@ -1,3 +1,30 @@
+<?php
+session_start();
+require_once 'session.php';
+
+$session = new Session();
+$isLoggedIn = $session->isLoggedIn();
+
+// Restrict access to admins only
+if (!$isLoggedIn) {
+    header("Location: login_view.php");
+    exit();
+}
+
+if ($session->getRole() === 'user') {
+    // Redirect users to their profile page
+    $patronId = $session->getPatronId();
+    header("Location: ../CONNECTED/profile.php?patron_id=" . urlencode($patronId));
+    exit();
+}
+
+if ($session->getRole() !== 'admin') {
+    // Redirect non-admins to an error page or login
+    header("Location: login_view.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +38,16 @@
   <header class="bg-dark text-white p-3 d-flex justify-content-between align-items-center">
     <h1 class="h4 m-0">Donation Ledger</h1>
     <a href="addDonation.php" class="btn btn-light text-dark">Donate</a>
-    <a href="Register.php" class="btn btn-light text-dark">Register</a>
+    <?php if (!$isLoggedIn): ?>
+        <a href="Register.php" class="btn btn-light text-dark">Register</a>
+    <?php else: ?>  
+        <?php if ($session->getRole() === 'user'): ?>
+            <?php
+            $patronId = $session->getPatronId();
+            ?>
+            <a href="../CONNECTED/profile.php?patron_id=<?= urlencode($patronId) ?>" class="btn btn-light text-dark">Profile</a>
+        <?php endif; ?>
+    <?php endif; ?>
   </header>
 
   <div class="container my-4">

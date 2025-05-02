@@ -6,8 +6,9 @@ if (!isset($_GET['patron_id'])) {
     exit;
 }
 
+$patron_id = intval($_GET['patron_id']);
 $crud = new CRUD();
-$info = $crud->getPatronInfo($_GET['patron_id']);
+$info = $crud->getPatronInfo($patron_id);
 
 if (isset($info['error'])) {
     echo "Database error: " . $info['error'];
@@ -19,7 +20,7 @@ if (empty($info)) {
     exit;
 }
 
-$patron = $info[0]; // basic patron info
+$patron = $info[0]; // Basic patron info
 
 // Group donations by timestamp
 $groupedDonations = [];

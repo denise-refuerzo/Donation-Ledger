@@ -1,9 +1,7 @@
 <?php
-require_once '../PHP/Session.php';
+require_once 'session.php';
 $session = new Session();
-
-if (!$session->isLoggedIn()) {
-    header("Location: welcomePage.php"); // or wherever your login page is
-    exit;
-}
+$session->logout();
+header("Location: login_view.php");
+exit;
 ?>
