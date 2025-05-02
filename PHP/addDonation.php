@@ -5,9 +5,6 @@ $success = "";
 $error = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = $_POST['name'] ?? null;
-    $email = $_POST['email'] ?? null;
-    $contact = $_POST['contact'] ?? null;
     $categories = [];
 
     if (isset($_POST['donate_item'])) {
@@ -21,17 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['donate_cash'])) {
         $categories[] = ['category' => 'Cash', 'cash_amt' => $_POST['cash_amt']];
     }
+
     $organization = $_POST['organization'] ?? '';
-    $anonymous = isset($_POST['anonymous']) ? 1 : 0;
-
-
-    if ($anonymous) {
-        $name = $email = $contact = null;
-    } else {
-        $name = trim($name) ?: null;
-        $email = trim($email) ?: null;
-        $contact = trim($contact) ?: null;
-    }
+    $anonymous = 1;
+    $name = $email = $contact = $hashed_password = null;
 
     $crud = new CRUD();
     $error = "";
@@ -39,31 +29,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($categories)) {
         $error = "Please select at least one donation category.";
     }
-    
+
     if (!$error) {
         foreach ($categories as $cat) {
-        $category = $cat['category'];
-        $item_name = $cat['item_name'] ?? null;
-        $item_qty = $cat['item_qty'] ?? null;
-        $food_kind = $cat['food_kind'] ?? null;
-        $food_qty = $cat['food_qty'] ?? null;
-        $cash_amt = $cat['cash_amt'] ?? null;
+            $category = $cat['category'];
+            $item_name = $cat['item_name'] ?? null;
+            $item_qty = $cat['item_qty'] ?? null;
+            $food_kind = $cat['food_kind'] ?? null;
+            $food_qty = $cat['food_qty'] ?? null;
+            $cash_amt = $cat['cash_amt'] ?? null;
 
-        $result = $crud->addDonation($name, $email, $contact, $category, $organization, $anonymous, $item_name, $item_qty, $food_kind, $food_qty, $cash_amt);
+            $result = $crud->addDonation($name, $email, $contact, $category, $organization, $anonymous, $item_name, $item_qty, $food_kind, $food_qty, $cash_amt, $hashed_password);
 
-        if ($result !== true) {
-            $error = $result;
-            break;
-        }
+            if ($result !== true) {
+                $error = $result;
+                break;
+            }
         }
     }
 
     if (!$error) {
-        $success = "Donation added successfully!";
-        $_POST = []; // ✅ Clear form inputs after success
+        $success = "Anonymous donation submitted successfully!";
+        $_POST = []; // Clear form
     }
-    
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -91,28 +81,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="card shadow-sm mx-auto p-4 bg-light" style="max-width: 500px;">
             <form method="POST">
-                <div class="mb-3">
-                    <input type="text" name="name" class="form-control" placeholder="Patron Name" value="<?= htmlspecialchars($_POST['name'] ?? '') ?>">
-                </div>
-
-                <div class="mb-3">
-                    <input type="email" name="email" class="form-control" placeholder="Email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
-                </div>
-
-                <div class="mb-3">
-                    <input type="text" name="contact" class="form-control" placeholder="Contact" value="<?= htmlspecialchars($_POST['contact'] ?? '') ?>">
-                </div>
-
+                
                 <div class="mb-3">
                     <input list="orgList" name="organization" class="form-control" placeholder="Select or enter an organization" required>
                     <datalist id="orgList"></datalist>
                 </div>
-
-                <div class="form-check mb-3">
-                    <input type="checkbox" name="anonymous" class="form-check-input" id="anonymousCheck">
-                    <label for="anonymousCheck" class="form-check-label">Donate Anonymously</label>
-                </div>
-
+                
                 <div class="form-check mb-2">
                 <input class="form-check-input" type="checkbox" id="itemCheck" name="donate_item">
                 <label class="form-check-label" for="itemCheck">Donate Item</label>

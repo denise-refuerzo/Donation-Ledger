@@ -35,8 +35,9 @@ if ($session->getRole() !== 'admin') {
 </head>
 <body class="bg-secondary bg-opacity-10 text-dark">
 
-  <header class="bg-dark text-white p-3 d-flex justify-content-between align-items-center">
-    <h1 class="h4 m-0">Donation Ledger</h1>
+<header class="bg-dark text-white p-3 d-flex justify-content-between align-items-center">
+  <h1 class="h4 m-0">Donation Ledger</h1>
+  <div class="d-flex gap-2">
     <a href="addDonation.php" class="btn btn-light text-dark">Donate</a>
     <?php if (!$isLoggedIn): ?>
         <a href="Register.php" class="btn btn-light text-dark">Register</a>
@@ -47,8 +48,11 @@ if ($session->getRole() !== 'admin') {
             ?>
             <a href="../CONNECTED/profile.php?patron_id=<?= urlencode($patronId) ?>" class="btn btn-light text-dark">Profile</a>
         <?php endif; ?>
+        <a href="logout.php" class="btn btn-light text-dark">Logout</a>
     <?php endif; ?>
-  </header>
+  </div>
+</header>
+
 
   <div class="container my-4">
     <div class="row g-3 mb-4">
@@ -186,7 +190,11 @@ if ($session->getRole() !== 'admin') {
         const isAnonymous = !row.name;
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><a href="../PHP/profile.php?patron_id=${row.patrons_id}" class="text-decoration-none">${isAnonymous ? "Anonymous" : row.name}</a></td>
+          <td>${
+            isAnonymous
+              ? '<span class="text-dark">Anonymous</span>'
+              : `<a href="../PHP/profile.php?patron_id=${row.patrons_id}" class="text-decoration-none text-dark">${row.name}</a>`
+          }</td>
           <td>${row.category}</td>
           <td>${row.organization}</td>
           <td>${row.status}</td>

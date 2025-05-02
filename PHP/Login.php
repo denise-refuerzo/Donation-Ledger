@@ -2,6 +2,7 @@
 session_start();
 require_once 'dbConnection.php';
 require_once 'session.php';
+require_once 'CRUD.php'; // Include your class
 
 $session = new Session();
 
@@ -13,41 +14,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         try {
             $db = new Database();
             $conn = $db->getConnection();
+            $crud = new CRUD($conn);
 
-            $user = null;
-
-            // Check in admin table
-            $stmt = $conn->prepare("CALL get_admin_credentials(:p_username)");
-            $stmt->bindParam(':p_username', $username);
-            $stmt->execute();
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $user = $crud->getAdminCredentials($username);
 
             if (!$user) {
-                // Check in user table
-                $stmt = $conn->prepare("CALL get_user_credentials(:p_email)");
-                $stmt->bindParam(':p_email', $username);
-                $stmt->execute();
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                $user = $crud->getUserCredentials($username);
             }
 
             if ($user && password_verify($password, $user['password'])) {
-                // Login successful
                 $_SESSION["logged_in"] = true;
                 $_SESSION["username"] = $username;
                 $_SESSION["role"] = $user['role'];
 
-                // Only set patron_id for users
                 if ($user['role'] === 'user') {
                     $_SESSION["patron_id"] = $user['patrons_id'];
-                    // Redirect user to their profile page
                     header("Location: ../CONNECTED/profile.php?patron_id=" . urlencode($user['patrons_id']));
                 } else {
-                    // Redirect admin to the index page
                     header("Location: ../PHP/index.php");
                 }
                 exit();
             } else {
-                // Invalid credentials
                 header("Location: ../PHP/login_view.php?error=1");
                 exit();
             }
