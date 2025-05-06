@@ -48,8 +48,11 @@ if ($session->getRole() !== 'admin') {
             ?>
             <a href="../CONNECTED/profile.php?patron_id=<?= urlencode($patronId) ?>" class="btn btn-light text-dark">Profile</a>
         <?php endif; ?>
+        <a href="logout.php" class="btn btn-light text-dark">Logout</a>
     <?php endif; ?>
-  </header>
+  </div>
+</header>
+
 
   <div class="container my-4">
     <div class="row g-3 mb-4">
@@ -187,7 +190,11 @@ if ($session->getRole() !== 'admin') {
         const isAnonymous = !row.name;
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><a href="../PHP/profile.php?patron_id=${row.patrons_id}" class="text-decoration-none">${isAnonymous ? "Anonymous" : row.name}</a></td>
+          <td>${
+            isAnonymous
+              ? '<span class="text-dark">Anonymous</span>'
+              : `<a href="../PHP/profile.php?patron_id=${row.patrons_id}" class="text-decoration-none text-dark">${row.name}</a>`
+          }</td>
           <td>${row.category}</td>
           <td>${row.organization}</td>
           <td>${row.status}</td>

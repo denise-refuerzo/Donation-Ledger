@@ -47,7 +47,6 @@ $categorySummary = $crud->getCategorySummary();
         <!-- Register Button -->
         <div class="d-flex justify-content-end mb-3 gap-2">
         <a href="register.php" class="btn btn-dark">Register</a>
-        <a href="dailydonation.php" class="btn btn-secondary">View Daily Donations</a>
         </div>
 
 

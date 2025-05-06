@@ -53,6 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Patron Profile</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 <body class="bg-light text-dark">
 
@@ -77,10 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
     <a href="addDonation.php?patron_id=<?= urlencode($_GET['patron_id']) ?>" class="btn btn-success mb-2 ms-2">Donate</a>
 
     <!-- Delete Patron Button -->
-    <form method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this patron and all their donations and related data?');">
+    <form id="deletePatronForm" method="POST" class="d-inline">
       <input type="hidden" name="delete_patron" value="1">
-      <button type="submit" class="btn btn-danger mb-2 ms-2">Delete Patron</button>
+      <button type="button" id="deletePatronBtn" class="btn btn-danger mb-2 ms-2">Delete Patron</button>
     </form>
+
 
     <!-- Donation History -->
     <?php if (!empty($groupedDonations)): ?>
@@ -130,6 +133,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
     <a href="../CONNECTED/welcomePage.php" class="btn btn-secondary">&larr; Back</a>
   </div>
 
+  <script>
+    document.getElementById('deletePatronBtn').addEventListener('click', function () {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "This will delete the patron and all related donations.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(window.location.href, {
+            method: 'POST',
+            body: new FormData(document.getElementById('deletePatronForm'))
+          })
+          .then(response => response.text())
+          .then(data => {
+            Swal.fire({
+              title: 'Deleted!',
+              text: 'The patron has been deleted.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = '../PHP/Login.php'; // or welcomePage.php
+            });
+          })
+          .catch(error => {
+            Swal.fire('Error', 'Something went wrong.', 'error');
+          });
+        }
+      });
+    });
+
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
