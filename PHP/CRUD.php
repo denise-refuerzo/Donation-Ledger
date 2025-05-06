@@ -184,5 +184,15 @@ class CRUD {
         }
     }
      
+    public function getDailyDonations() {
+        try {
+            $stmt = $this->conn->prepare("CALL GetDailyDonations()");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
+    
 }
 ?>
