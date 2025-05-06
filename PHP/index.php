@@ -35,10 +35,10 @@ if ($session->getRole() !== 'admin') {
 </head>
 <body class="bg-secondary bg-opacity-10 text-dark">
 
-<header class="bg-dark text-white p-3 d-flex justify-content-between align-items-center">
-  <h1 class="h4 m-0">Donation Ledger</h1>
-  <div class="d-flex gap-2">
-    <a href="addDonation.php" class="btn btn-light text-dark">Donate</a>
+  <header class="bg-dark text-white p-3 d-flex justify-content-between align-items-center">
+    <h1 class="h4 m-0">Donation Ledger</h1>
+    <a href="addDonation.php" class="btn btn-light text-dark me-2">Donate</a>
+    <a href="../PHP/dailydonation.php" class="btn btn-light text-dark me-2">Daily Donations</a>
     <?php if (!$isLoggedIn): ?>
         <a href="Register.php" class="btn btn-light text-dark">Register</a>
     <?php else: ?>  

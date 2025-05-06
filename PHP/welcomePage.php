@@ -45,9 +45,10 @@ $categorySummary = $crud->getCategorySummary();
 <body>
     <div class="container mt-5">
         <!-- Register Button -->
-        <div class="d-flex justify-content-end mb-3">
-            <a href="register.php" class="btn btn-dark">Register</a>
+        <div class="d-flex justify-content-end mb-3 gap-2">
+        <a href="register.php" class="btn btn-dark">Register</a>
         </div>
+
 
         <div id="noticeBox" class="animate__animated animate__fadeInDown">
             <div class="alert alert-warning alert-dismissible text-center shadow" role="alert">
