@@ -42,6 +42,11 @@ if ($session->isLoggedIn()) {
           </div>
           <a href="#" class="small text-light text-decoration-none">Forget Password?</a>
         </div>
+        <div class="text-center mt-3">
+            <p>Don't have an account? 
+                <a href="Register.php" class="text-decoration-none">Click here</a>
+            </p>
+        </div>
 
         <button type="submit" class="btn btn-light text-dark fw-bold w-100">Login</button>
       </form>

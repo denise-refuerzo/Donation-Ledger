@@ -227,6 +227,30 @@ class CRUD {
             return ['error' => $e->getMessage()];
         }
     }
+
+    public function calendarDonations() {
+        try {
+            $db = new Database();
+            $conn = $db->getConnection();
+            $events = [];
+    
+            $stmt = $conn->prepare("CALL displaydonation()");
+            $stmt->execute();
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            foreach ($data as $row) {
+                $events[] = [
+                    'title' => '₱' . number_format($row['cashamount'], 2),
+                    'start' => $row['donationdate']
+                ];
+            }
+    
+            return json_encode($events);
+        } catch (PDOException $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
+    
     
 }
 ?>

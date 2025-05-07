@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
               timer: 2000,
               showConfirmButton: false
             }).then(() => {
-              window.location.href = '../PHP/Login.php'; // or welcomePage.php
+              window.location.href = '../PHP/login_view.php'; // or welcomePage.php
             });
           })
           .catch(error => {
