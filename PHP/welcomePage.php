@@ -6,6 +6,14 @@ $cashData = $crud->getCashDonations();
 $total = $crud->getTotalDonations()['total'];
 $categorySummary = $crud->getCategorySummary();
 
+
+$donationCounts = array_map('intval', array_column($categorySummary, 'donation_count'));
+$donationLabels = array_column($categorySummary, 'category');
+$totalDonations = array_sum($donationCounts);
+$donationPercentages = array_map(function($count) use ($totalDonations) {
+    return round(($count / $totalDonations) * 100, 2);
+}, $donationCounts);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,6 +23,8 @@ $categorySummary = $crud->getCategorySummary();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
     <style>
         body {
             background-color: #ced4da;
@@ -94,6 +104,18 @@ $categorySummary = $crud->getCategorySummary();
             </div>
         </div>
     </div>
+
+    <!-- pie chart -->
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-5">
+            <div class="card p-5 shadow-sm">
+                <h5 class="text-muted text-center mb-3">Donation Category Distribution</h5>
+                <canvas id="categoryPieChart" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+
+
 
     <!-- About Us Section -->
     <div class="bg-dark text-white py-4 mt-5 w-100">
@@ -178,6 +200,55 @@ $categorySummary = $crud->getCategorySummary();
                 }
             }
         });
+
+        //for pie chart
+       // Pie Chart: Category Distribution with Percentages
+        const ctxPie = document.getElementById('categoryPieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: <?= json_encode($donationLabels) ?>,
+                datasets: [{
+                    data: <?= json_encode($donationCounts) ?>,
+                    backgroundColor: ['#adb5bd', '#6c757d', '#343a40', '#f8f9fa', '#e9ecef'],  // Add more if needed
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    datalabels: {
+                        color: '#fff',
+                        formatter: (value, context) => {
+                            const total = context.chart._metasets[0].total;
+                            const percent = ((value / total) * 100).toFixed(1);
+                            return percent + '%';
+                        },
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        }
+                    },
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.parsed;
+                                const label = context.label;
+                                const percentage = (value / <?= $totalDonations ?> * 100).toFixed(2);
+                                return `${label}: ${value} donations (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
+    
+
     </script>
 </body>
 </html>
