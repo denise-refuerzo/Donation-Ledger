@@ -26,6 +26,13 @@ if ($session->isLoggedIn()) {
     <div class="card p-4 shadow-lg bg-dark text-white" style="max-width: 400px; width: 100%;">
       <h2 class="text-center mb-4">Login</h2>
 
+      <?php if (isset($_GET['deleted']) && $_GET['deleted'] == '1'): ?>
+      <div class="alert alert-success alert-dismissible fade show mb-4">
+        Account successfully deleted.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      <?php endif; ?>
+
       <form action="../PHP/Login.php" method="POST">
         <div class="mb-3">
           <input type="text" class="form-control bg-light text-dark" name="username" placeholder="Username" required />
@@ -41,6 +48,11 @@ if ($session->isLoggedIn()) {
             <label class="form-check-label text-white" for="rememberMe">Remember me</label>
           </div>
           <a href="#" class="small text-light text-decoration-none">Forget Password?</a>
+        </div>
+        <div class="text-center mt-3">
+            <p>Don't have an account? 
+                <a href="Register.php" class="text-decoration-none">Click here</a>
+            </p>
         </div>
 
         <button type="submit" class="btn btn-light text-dark fw-bold w-100">Login</button>

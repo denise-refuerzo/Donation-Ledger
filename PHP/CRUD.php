@@ -28,9 +28,21 @@ class CRUD {
     }
     
 
-    public function addDonation($name, $email, $contact, $category, $organization, $anonymous, $item_name, $item_qty, $food_kind, $food_qty, $cash_amt) {
+    public function addDonation($name, $email, $contact, $category, $organization, $anonymous, $item_name, $item_qty, $food_kind, $food_qty, $cash_amt, $patron_id = null) {
         try {
-            $stmt = $this->conn->prepare("CALL addDonation(:p_name, :p_email, :p_contact, :p_category, :p_organization, :p_anonymous, :p_item_name, :p_item_qty, :p_food_kind, :p_food_qty, :p_cash_amt, @donation_id)");
+            $stmt = $this->conn->prepare("
+                CALL addDonation(
+                    :p_name, :p_email, :p_contact, :p_category, :p_organization, :p_anonymous, 
+                    :p_item_name, :p_item_qty, :p_food_kind, :p_food_qty, :p_cash_amt, 
+                    @donation_id, :p_id
+                )
+            ");
+    
+            // Bind as NULL if anonymous
+            $name = $anonymous ? null : $name;
+            $email = $anonymous ? null : $email;
+            $contact = $anonymous ? null : $contact;
+            $patron_id = $anonymous ? null : $patron_id;
     
             $stmt->bindParam(':p_name', $name);
             $stmt->bindParam(':p_email', $email);
@@ -43,18 +55,22 @@ class CRUD {
             $stmt->bindParam(':p_food_kind', $food_kind);
             $stmt->bindParam(':p_food_qty', $food_qty);
             $stmt->bindParam(':p_cash_amt', $cash_amt);
+            $stmt->bindParam(':p_id', $patron_id, PDO::PARAM_INT);
     
             $stmt->execute();
     
+            // Get the OUT parameter
             $stmt = $this->conn->query("SELECT @donation_id AS donation_id");
             $donation_id = $stmt->fetchColumn();
-     
+    
             return true;
     
         } catch (PDOException $e) {
             return "Error: " . $e->getMessage();
         }
     }
+    
+    
 
     public function addDonationWithID($patron_id, $category, $organization, $anonymous, $item_name, $item_qty, $food_kind, $food_qty, $cash_amt) {
         try {
@@ -183,6 +199,70 @@ class CRUD {
             return false;
         }
     }
+
+    public function getAdminCredentials($username) {
+        $stmt = $this->conn->prepare("CALL get_admin_credentials(:p_username)");
+        $stmt->bindParam(':p_username', $username);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor(); // Important for next SP call
+        return $user;
+    }
+
+    public function getUserCredentials($email) {
+        $stmt = $this->conn->prepare("CALL get_user_credentials(:p_email)");
+        $stmt->bindParam(':p_email', $email);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        return $user;
+    }
      
+    public function getDailyDonations() {
+        try {
+            $stmt = $this->conn->prepare("CALL GetDailyDonations()");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
+
+    public function calendarDonations() {
+        try {
+            $db = new Database();
+            $conn = $db->getConnection();
+            $events = [];
+    
+            $stmt = $conn->prepare("CALL displaydonation()");
+            $stmt->execute();
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            foreach ($data as $row) {
+                $events[] = [
+                    'title' => '₱' . number_format($row['cashamount'], 2),
+                    'start' => $row['donationdate']
+                ];
+            }
+    
+            return json_encode($events);
+        } catch (PDOException $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Get donations data grouped by date for the time chart
+     * @return array Array of donation amounts by date
+     */
+    public function getDonationsOverTime() {
+        try {
+            $stmt = $this->conn->prepare("CALL getDonationsOverTime()");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
 }
 ?>
