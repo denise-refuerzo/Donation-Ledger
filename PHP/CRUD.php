@@ -251,6 +251,15 @@ class CRUD {
         }
     }
     
-    
+    public function getDonationsOverTime() {
+        try {
+            $stmt = $this->conn->prepare("CALL getDonationsOverTime()");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
+
 }
 ?>

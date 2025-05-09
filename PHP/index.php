@@ -42,6 +42,7 @@ if ($session->getRole() !== 'admin') {
     <a href="dailydonation.php" class="btn btn-light text-dark me-2">Daily Donations</a>
     <a href="grouped_chart.php" class="btn btn-light text-dark">Grouped Chart</a> <!-- New Button -->
     <a href="calendar.php" class="btn btn-light text-dark">View Calendar</a>
+    <a href="donationsTimeChart.php" class="btn btn-light text-dark me-2">Donations Over Time</a>
     <a href="logout.php" class="btn btn-light text-dark">Logout</a>
 
   </div>

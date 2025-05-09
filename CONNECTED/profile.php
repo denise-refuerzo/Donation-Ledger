@@ -37,11 +37,20 @@ foreach ($info as $donation) {
 // Handle deletion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
     $deleteResult = $crud->deletePatron($_GET['patron_id']);
+    
     if ($deleteResult === true) {
-        header("Location: ../PHP/index.php?deleted=1");
+        if (session_status() != PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+        session_unset();
+        session_destroy();
+      
+        echo "<script>
+            window.location.href = '../PHP/login_view.php?deleted=1';
+        </script>";
         exit;
     } else {
-        echo "<div class='alert alert-danger'>Error: " . $deleteResult['error'] . "</div>";
+        echo "<div class='alert alert-danger'>Error: " . (is_array($deleteResult) && isset($deleteResult['error']) ? $deleteResult['error'] : "Unknown error") . "</div>";
     }
 }
 ?>
@@ -145,6 +154,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
         confirmButtonText: 'Yes, delete it!'
       }).then((result) => {
         if (result.isConfirmed) {
+
+          document.getElementById('deletePatronForm').submit();
+        }
+      });
+    });
           fetch(window.location.href, {
             method: 'POST',
             body: new FormData(document.getElementById('deletePatronForm'))
@@ -167,7 +181,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
         }
       });
     });
-
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
