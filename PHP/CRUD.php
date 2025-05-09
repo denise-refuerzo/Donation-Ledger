@@ -251,10 +251,6 @@ class CRUD {
         }
     }
     
-    /**
-     * Get donations data grouped by date for the time chart
-     * @return array Array of donation amounts by date
-     */
     public function getDonationsOverTime() {
         try {
             $stmt = $this->conn->prepare("CALL getDonationsOverTime()");
@@ -264,5 +260,6 @@ class CRUD {
             return ['error' => $e->getMessage()];
         }
     }
+
 }
 ?>
