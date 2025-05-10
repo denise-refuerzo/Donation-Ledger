@@ -67,6 +67,13 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
                 title: 'Email already in use',
                 text: 'Please use a different email address.'
             });
+        } else if (result.status === 'duplicate_contact') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Contact already in use',
+                text: 'Please use a different contact number.'
+            });
+
         } else if (result.status === 'success') {
             Swal.fire({
                 icon: 'success',

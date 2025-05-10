@@ -145,7 +145,7 @@ class CRUD {
   
     public function getPatronInfo($patron_id) {
         try {
-            $stmt = $this->conn->prepare("CALL GetPatronInfo(:patron_id)");
+            $stmt = $this->conn->prepare("CALL getPatroninfo(:patron_id)");
             $stmt->bindParam(':patron_id', $patron_id, PDO::PARAM_INT);
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -191,7 +191,10 @@ class CRUD {
     
             if ($result && $result['id'] == -1) {
                 return -1; // email exists
+            } elseif ($result && $result['id'] == -2) {
+                return -2; // contact exists
             }
+            
     
             return $result['id'] ?? false;
         } catch (PDOException $e) {
@@ -201,7 +204,7 @@ class CRUD {
     }
 
     public function getAdminCredentials($username) {
-        $stmt = $this->conn->prepare("CALL get_admin_credentials(:p_username)");
+        $stmt = $this->conn->prepare("CALL getAdmincredentials(:p_username)");
         $stmt->bindParam(':p_username', $username);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -210,7 +213,7 @@ class CRUD {
     }
 
     public function getUserCredentials($email) {
-        $stmt = $this->conn->prepare("CALL get_user_credentials(:p_email)");
+        $stmt = $this->conn->prepare("CALL getUsercredentials(:p_email)");
         $stmt->bindParam(':p_email', $email);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -220,7 +223,7 @@ class CRUD {
      
     public function getDailyDonations() {
         try {
-            $stmt = $this->conn->prepare("CALL GetDailyDonations()");
+            $stmt = $this->conn->prepare("CALL getDailydonations()");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -253,7 +256,7 @@ class CRUD {
     
     public function getDonationsOverTime() {
         try {
-            $stmt = $this->conn->prepare("CALL getDonationsOverTime()");
+            $stmt = $this->conn->prepare("CALL getDonationsoverTime()");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
