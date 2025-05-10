@@ -191,7 +191,10 @@ class CRUD {
     
             if ($result && $result['id'] == -1) {
                 return -1; // email exists
+            } elseif ($result && $result['id'] == -2) {
+                return -2; // contact exists
             }
+            
     
             return $result['id'] ?? false;
         } catch (PDOException $e) {

@@ -19,7 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $patronId = $crud->RegisterPatron($name, $email, $contact, $hashedPassword);
 
     if ($patronId === -1) {
-        echo json_encode(['status' => 'duplicate']);
+        echo json_encode(['status' => 'duplicate']); // email
+    } elseif ($patronId === -2) {
+        echo json_encode(['status' => 'duplicate_contact']); // contact
     } elseif ($patronId) {
         session_start();
         $_SESSION["logged_in"] = true;
