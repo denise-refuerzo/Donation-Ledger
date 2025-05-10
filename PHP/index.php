@@ -36,16 +36,22 @@ if ($session->getRole() !== 'admin') {
 <body class="bg-secondary bg-opacity-10 text-dark">
 
 <header class="bg-dark text-white p-3 d-flex justify-content-between align-items-center">
-  <h1 class="h4 m-0">Donation Ledger</h1>
-  <div>
-    <a href="addDonation.php" class="btn btn-light text-dark me-2">Donate</a>
-    <a href="dailydonation.php" class="btn btn-light text-dark me-2">Daily Donations</a>
-    <a href="grouped_chart.php" class="btn btn-light text-dark">Grouped Chart</a> <!-- New Button -->
-    <a href="calendar.php" class="btn btn-light text-dark">View Calendar</a>
-    <a href="donationsTimeChart.php" class="btn btn-light text-dark me-2">Donations Over Time</a>
-    <a href="logout.php" class="btn btn-light text-dark">Logout</a>
-
+    <h1 class="h4 m-0">
+      <a href="../CONNECTED/welcomePage.php" class="text-white text-decoration-none">Donation Ledger</a>
+    </h1>
+    <header class="bg-dark text-white p-3">
+  <div class="container-fluid d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+    <div class="d-flex flex-wrap gap-2">
+      <a href="addDonation.php" class="btn btn-light text-dark">Donate</a>
+      <a href="dailydonation.php" class="btn btn-light text-dark">Daily Donations</a>
+      <a href="grouped_chart.php" class="btn btn-light text-dark">Grouped Chart</a>
+      <a href="calendar.php" class="btn btn-light text-dark">View Calendar</a>
+      <a href="donationsTimeChart.php" class="btn btn-light text-dark">Donations Over Time</a>
+      <a href="logout.php" class="btn btn-danger text-white">Logout</a>
+    </div>
   </div>
+</header>
+
 </header>
 
 
