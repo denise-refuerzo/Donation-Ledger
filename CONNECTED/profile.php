@@ -1,12 +1,35 @@
 <?php
 require_once '../PHP/CRUD.php';
+require_once '../PHP/session.php';
 
+// Initialize session management
+$session = new Session();
+
+// Check if user is logged in
+if (!$session->isLoggedIn()) {
+    header("Location: ../PHP/login_view.php?error=login_required");
+    exit;
+}
+
+// Get patron ID from URL
 if (!isset($_GET['patron_id'])) {
-    echo "No patron selected.";
+    header("Location: ../PHP/index.php");
     exit;
 }
 
 $patron_id = intval($_GET['patron_id']);
+
+// Authorization check: Only allow viewing if it's your own profile OR you're an admin
+$currentRole = $session->getRole();
+$currentPatronId = $session->getPatronId();
+
+if ($currentRole !== 'admin' && $currentPatronId != $patron_id) {
+    // Unauthorized access attempt - either redirect to their own profile or show error
+    header("Location: ../PHP/unauthorized.php");
+    exit;
+}
+
+// Continue with getting patron info
 $crud = new CRUD();
 $info = $crud->getPatronInfo($patron_id);
 

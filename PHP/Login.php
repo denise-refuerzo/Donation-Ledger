@@ -2,7 +2,7 @@
 session_start();
 require_once 'dbConnection.php';
 require_once 'session.php';
-require_once 'CRUD.php'; // Include your class
+require_once 'CRUD.php';
 
 $session = new Session();
 
@@ -26,9 +26,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION["logged_in"] = true;
                 $_SESSION["username"] = $username;
                 $_SESSION["role"] = $user['role'];
-
+                
                 if ($user['role'] === 'user') {
                     $_SESSION["patron_id"] = $user['patrons_id'];
+                } else if ($user['role'] === 'admin') {
+                    $_SESSION["admin_id"] = $user['id']; 
+                    unset($_SESSION["patron_id"]);
+                }
+                
+                $session->regenerateId();
+
+                if ($user['role'] === 'user') {
                     header("Location: ../CONNECTED/profile.php?patron_id=" . urlencode($user['patrons_id']));
                 } else {
                     header("Location: ../PHP/index.php");

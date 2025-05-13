@@ -1,15 +1,44 @@
 <?php
 session_start();
 require_once "../PHP/CRUD.php";
+require_once "../PHP/session.php";
+
+$session = new Session();
+
+if (!$session->isLoggedIn()) {
+    header("Location: ../PHP/login_view.php?error=login_required");
+    exit;
+}
+
+if (isset($_GET['patron_id'])) {
+    $patron_id = (int)$_GET['patron_id'];
+    $currentRole = $session->getRole();
+    $currentPatronId = $session->getPatronId();
+    
+    if ($currentRole !== 'admin' && $currentPatronId != $patron_id) {
+        header("Location: ../PHP/unauthorized.php");
+        exit;
+    }
+    
+    $_SESSION['viewed_patron_id'] = $patron_id;
+} else {
+    $patron_id = $_SESSION['viewed_patron_id'] ?? $session->getPatronId();
+}
+
+$patronName = '';
+if ($session->getRole() === 'admin' && isset($_GET['patron_id'])) {
+    $crud = new CRUD();
+    $patronInfo = $crud->getPatronInfo($patron_id);
+    if (!empty($patronInfo) && isset($patronInfo[0]['name'])) {
+        $patronName = $patronInfo[0]['name'];
+    }
+    if (empty($patronName)) {
+        $patronName = "Patron #" . $patron_id;
+    }
+}
 
 $success = "";
 $error = "";
-
-// Ensure patron_id is set via GET and stored in session if not already done
-if (isset($_GET['patron_id'])) {
-    $_SESSION['patron_id'] = (int) $_GET['patron_id'];
-}
-$patron_id = $_SESSION['patron_id'] ?? null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once "../PHP/CRUD.php";
@@ -60,6 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body class="bg-secondary bg-opacity-10 text-dark">
 
@@ -74,6 +105,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <?php if ($error): ?>
             <div class="alert alert-danger text-center"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+        <?php if ($session->getRole() === 'admin' && $patron_id != $session->getPatronId() && !empty($patronName)): ?>
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <div>
+                You are adding a donation on behalf of <strong><?= htmlspecialchars($patronName) ?></strong> (Patron ID: <?= $patron_id ?>)
+            </div>
+        </div>
         <?php endif; ?>
 
         <div class="card shadow-sm mx-auto p-4 bg-light" style="max-width: 500px;">
@@ -130,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 .then(res => res.json())
                 .then(data => {
                     const datalist = document.getElementById('orgList');
-                    datalist.innerHTML = ''; // Clear just in case
+                    datalist.innerHTML = ''; 
                     data.forEach(org => {
                         const option = document.createElement('option');
                         option.value = org.organization;
@@ -158,7 +197,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (field) {
                         field.required = checked;
 
-                        // 🧽 Clear the field if unchecked
                         if (!checked) {
                             field.value = "";
                         }

@@ -264,5 +264,25 @@ class CRUD {
             return ['error' => $e->getMessage()];
         }
     }
+
+    public function searchPatrons($query) {
+        try {
+            $stmt = $this->conn->prepare("
+                SELECT patrons_id, name, email 
+                FROM patrons_info
+                WHERE name LIKE ? OR email LIKE ?
+                ORDER BY name
+                LIMIT 10
+            ");
+            $searchTerm = "%$query%";
+            $stmt->bindParam(1, $searchTerm);
+            $stmt->bindParam(2, $searchTerm);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
 }
 ?>
