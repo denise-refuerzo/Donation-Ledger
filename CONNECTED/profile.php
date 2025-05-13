@@ -177,10 +177,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_patron'])) {
         confirmButtonText: 'Yes, delete it!'
       }).then((result) => {
         if (result.isConfirmed) {
+
           document.getElementById('deletePatronForm').submit();
         }
       });
     });
+          fetch(window.location.href, {
+            method: 'POST',
+            body: new FormData(document.getElementById('deletePatronForm'))
+          })
+          .then(response => response.text())
+          .then(data => {
+            Swal.fire({
+              title: 'Deleted!',
+              text: 'The patron has been deleted.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = '../PHP/login_view.php'; // or welcomePage.php
+            });
+          })
+          .catch(error => {
+            Swal.fire('Error', 'Something went wrong.', 'error');
+          });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
